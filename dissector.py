@@ -30,7 +30,7 @@ from scapy.layers.ntp import *
 from scapy.layers.x509 import *
 from scapy.layers.dns import *
 from scapy.layers.llmnr import *
-from scapy.layers.sebek import *
+# from scapy.layers.sebek import *
 from scapy.layers.pflog import *
 from scapy.layers.dot11 import *
 from scapy.layers.mgcp import *
@@ -38,15 +38,18 @@ from scapy.layers.skinny import *
 '''
 import the protocols classes
 '''
+"""
 from ftp import *
 from http import *
 from imap import *
 from irc import *
 from pop import *
 from sip import *
-from smtp import *
 from ssh import *
 from telnet import *
+"""
+from smtp import *
+
 
 
 def is_created_session(Src, Dst, SPort, DPort):
@@ -156,12 +159,13 @@ def check_stream(Src, Dst, SPort, DPort, Seq, s):
     """
     this method is used for purpose of tcp stream reassemble,
     for checking whether if this is the last packet in the stream or not.
+    此方法用于 tcp 流重组的目的，用于检查这是否是流中的最后一个数据包。
     @param Src: source ip address
     @param Dst: destination ip address
     @param SPort: source port number
     @param DPort: destination port number
     @param seq: sequence number
-    @param s: packet payload to create a new session or to be appended in an existed session.
+    @param s: packet payload to create a new session or to be appended in an existed session.数据包有效负载以创建新会话或附加到现有会话中。
     """
     if not dissector.is_created_session(Src, Dst, SPort, DPort):
         seqn = Seq

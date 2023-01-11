@@ -18,7 +18,6 @@ def name_generator(size=9, chars=string.ascii_uppercase + string.digits):
     """
     return ''.join(random.choice(chars) for x in range(size))
 
-
 src = ""
 dst = ""
 sport = ""
@@ -28,17 +27,17 @@ seq = ""
 # holds smtp sessions
 bounded = []
 
-
 def get_tcp_ip():
     """
     this method is for retrieving the ip and tcp values
+    此方法用于检索 ip 和 tcp 值
     """
     return src, dst, sport, dport, seq
-
 
 def set_tcp_ip(srcp, dstp, sportp, dportp, seqp):
     """
     this method is for set values in the global variables for tcp/ip
+    此方法用于在 tcp/ip 的全局变量中设置值
     @param srcp: source ip address
     @param dstp: destination ip address
     @param sportp: source port number
@@ -52,7 +51,6 @@ def set_tcp_ip(srcp, dstp, sportp, dportp, seqp):
     dport = dportp
     seq = seqp
 
-
 def bind(Src, Dst, Port):
     """
     method for creating smtp data sessions
@@ -62,14 +60,12 @@ def bind(Src, Dst, Port):
     """
     bounded.append([Src, Dst, Port])
 
-
 def unbind(Src, Dst, Port):
     """
     do the opposite of bind()
     """
     if [Src, Dst, Port] in bounded:
         bounded.remove([Src, Dst, Port])
-
 
 def is_bounded(Src, Dst, Port):
     """
@@ -83,25 +79,14 @@ def is_bounded(Src, Dst, Port):
     return False
 
 
+
 class SMTPDataField(XByteField):
     """
     this is a field class for handling the smtp data
     @attention: this class inherets XByteField
     """
     holds_packets = 1
-    name = "SMTPDataField"
     myresult = ""
-
-    def __init__(self, name, default):
-        """
-        class constructor, for initializing instance variables
-        @param name: name of the field
-        @param default: Scapy has many formats to represent the data
-        internal, human and machine. anyways you may sit this param to None.
-        """
-        self.name = name
-        self.fmt = "!B"
-        Field.__init__(self, name, default, "!B")
 
     def getfield(self, pkt, s):
         """
@@ -140,6 +125,17 @@ class SMTPDataField(XByteField):
             self.myresult = self.myresult + base64.standard_b64encode(c)
         return "", self.myresult
 
+    def __init__(self, name, default):
+        """
+        class constructor, for initializing instance variables 类构造函数，用于初始化实例变量
+        @param name: name of the field
+        @param default: Scapy has many formats to represent the data
+        internal, human and machine. anyways you may sit this param to None.Scapy
+        """
+        self.name = name
+        self.fmt = "!B"
+        Field.__init__(self, name, default, "!B")
+
 
 class SMTPResField(StrField):
     """
@@ -147,62 +143,50 @@ class SMTPResField(StrField):
     @attention: this class inherets StrField
     """
     holds_packets = 1
-    name = "SMTPReField"
 
     def get_code_msg(self, cn):
+        codes = {
+                 "211": "System status, or system help reply",
+                 "214": "Help message",
+                 "220": "<domain> Service ready",
+                 "221": "<domain> Service closing transmission channel",
+                 "235": "Authentication successful",
+                 "250": "Requested mail action okay, completed",
+                 "251": "User not local; will forward to <forward-path>",
+                 "252": "Cannot VRFY user, but will accept message and attempt delivery",
+                 "334": "AUTH input",
+                 "354": "Start mail input; end with <CRLF>.<CRLF>",
+                 "421": "<domain> Service not available, closing transmission channel",
+                 "432": "A password transition is needed",
+                 "450": "Requested mail action not taken: mailbox unavailable",
+                 "451": "Requested action aborted: local error in processing",
+
+                 "451": "Requested action aborted: error in processing",
+
+                 "452": "Requested action not taken: insufficient system storage",
+                 "454": "Temporary authentication failed",
+                 "455": "Server unable to accommodate parameters",
+                 "500": "Syntax error, command unrecognized",
+                 "501": "Syntax error in parameters or arguments",
+                 "502": "Command not implemented",
+                 "503": "Bad sequence of commands",
+                 "504": "Command parameter not implemented",
+                 "530": "Authentication required",
+                 "534": "Authentication mechanism is too weak",
+                 "535": "Authentication credentials invalid",
+                 "538": "Encryption required for requested authentication mechanism",
+                 "550": "Requested action not taken: mailbox unavailable",
+                 "551": "User not local; please try <forward-path>",
+                 "552": "Requested mail action aborted: exceeded storage allocation",
+                 "553": "Requested action not taken: mailbox name not allowed",
+                 "554": "Transaction failed",
+                 "555": "MAIL FROM/RCPT TO parameters not recognized or not implemented",
+                 "0": "NULL"}
+
         """
         method returns a message for every a specific code number
         @param cn: code number
         """
-        codes = {
-                 "500": "Syntax error, command unrecognized",
-                 "501": "Syntax error in parameters or arguments",
-                 "502": "Command not implemented",
-                 "503": "Bad sequence of commands",
-                 "504": "Command parameter not implemented",
-                 "211": "System status, or system help reply",
-                 "214": "Help message",
-                 "220": "<domain> Service ready",
-                 "221": "<domain> Service closing transmission channel",
-                 "421": "<domain> Service not available,\
-                 closing transmission channel",
-                 "250": "Requested mail action okay, completed",
-                 "251": "User not local; will forward to <forward-path>",
-                 "450": "Requested mail action not taken: mailbox unavailable",
-                 "550": "Requested action not taken: mailbox unavailable",
-                 "451": "Requested action aborted: error in processing",
-                 "551": "User not local; please try <forward-path>",
-                 "452": "Requested action not taken: insufficient system\
-                  storage",
-                 "552": "Requested mail action aborted: exceeded storage\
-                  allocation",
-                 "553": "Requested action not taken: mailbox name not allowed",
-                 "354": "Start mail input; end with <CRLF>.<CRLF>",
-                 "554": "Transaction failed",
-                 "211": "System status, or system help reply",
-                 "214": "Help message",
-                 "220": "<domain> Service ready",
-                 "221": "<domain> Service closing transmission channel",
-                 "250": "Requested mail action okay, completed",
-                 "251": "User not local; will forward to <forward-path>",
-                 "354": "Start mail input; end with <CRLF>.<CRLF>",
-                 "421": "<domain> Service not available, closing \
-                 transmission channel",
-                 "450": "Requested mail action not taken: mailbox unavailable",
-                 "451": "Requested action aborted: local error in processing",
-                 "452": "Requested action not taken: insufficient system\
-                  storage",
-                 "500": "Syntax error, command unrecognized",
-                 "501": "Syntax error in parameters or arguments",
-                 "502": "Command not implemented",
-                 "503": "Bad sequence of commands",
-                 "504": "Command parameter not implemented",
-                 "550": "Requested action not taken: mailbox unavailable",
-                 "551": "User not local; please try <forward-path>",
-                 "552": "Requested mail action aborted: exceeded storage\
-                  allocation",
-                 "553": "Requested action not taken: mailbox name not allowed",
-                 "554": "Transaction failed"}
         if cn in codes:
             return codes[cn]
         return "Unknown Response Code"
@@ -214,25 +198,51 @@ class SMTPResField(StrField):
         first value which belongs to this field and the second is
         the remaining which does need to be dissected with
         other "field classes".
+        此方法将获取数据包，取走需要取走的内容，然后让其余的走，因此它返回两个值。属于该字段的第一个值，第二个是剩余的值，需要与其他“字段类”一起剖析。
         @param pkt: holds the whole packet
-        @param s: holds only the remaining data which is not dissected yet.
+        @param s: holds only the remaining data which is not dissected yet.仅保留尚未剖析的剩余数据
         """
-        cstream = -1
-        if pkt.underlayer.name == "TCP":
-            cstream = dissector.check_stream(\
-            pkt.underlayer.underlayer.fields["src"],\
-             pkt.underlayer.underlayer.fields["dst"],\
-              pkt.underlayer.fields["sport"],\
-               pkt.underlayer.fields["dport"],\
-                pkt.underlayer.fields["seq"], s)
-        if not cstream == -1:
-            s = cstream
+        # cstream = -1
+        # if pkt.underlayer.name == "TCP":
+        #     cstream = dissector.check_stream(\
+        #     pkt.underlayer.underlayer.fields["src"],\
+        #      pkt.underlayer.underlayer.fields["dst"],\
+        #       pkt.underlayer.fields["sport"],\
+        #        pkt.underlayer.fields["dport"],\
+        #         pkt.underlayer.fields["seq"], s)
+        # if not cstream == -1:
+        #     s = cstream
         remain = ""
         value = ""
         ls = s.splitlines()
-        length = len(ls)
+        print("ls:       ", ls)
+        length_ls = len(ls)
+        print("length_ls: ", length_ls)
+
+
+        # python3区分str与bytes，这里将bytes转换成str, 注意到command中存在后缀'-'，理应除去
+        # ls01 = [str(ls[i], encoding="utf-8") for i in range(length)]
+        ls01 = []
+        for i in range(length_ls):
+            str01 = str(ls[i], encoding="utf-8")
+
+            # if i == 0 or len(str01) > 3:
+            str_list = str01.replace('-', ' ', 1)
+            ls01.append(str_list)
+
+                # for j in range(len(str_list)):
+                #     if str_list[j] == '':
+                #         continue
+                #     else:
+                #         ls01.append(str_list[j])
+            # else:
+            #     ls01.append(str01)
+
+        length = len(ls01)
+        print("ls01: ", ls01)
+        print("length:", length)
         if length == 1:
-            value = ls[0]
+            value = ls01[0]
             arguments = ""
             first = True
             res = value.split(" ")
@@ -241,31 +251,46 @@ class SMTPResField(StrField):
                     arguments = arguments + arg + " "
                 first = False
             if "-" in res[0]:
-                value = "(" + res[0][:3] + ") " +\
-                 self.get_code_msg(res[0][:3]) + " " + res[0][3:]
+                # value = "(" + res[0][:3] + ") " +\
+                #  self.get_code_msg(res[0][:3]) + " " + res[0][3:]
+                value = self.get_code_msg(res[0][:3]) + " " + res[0][3:] + "(" + res[0][:3] + ")"
             else:
-                value = "(" + res[0] + ") " + self.get_code_msg(res[0])
+                # value = "(" + res[0] + ") " + self.get_code_msg(res[0])
+                value = self.get_code_msg(res[0]) + "(" + res[0] + ")"
+            print("arguments[:-1] :", arguments[:-1])
+            print("value:", value)
             return arguments[:-1], [value]
 
         if length > 1:
-            reponses = []
-            for element in ls:
-                element = element.split(" ")
-                arguments = ""
-                first = True
-                for arg in element:
-                    if not first:
-                        arguments = arguments + arg + " "
-                    first = False
-                if "-" in element[0]:
-                    reponses.append(["(" + element[0][:3] + ") " +
-                                      self.get_code_msg(element[0][:3]) +
-                                       " " + element[0][3:], arguments[:-1]])
-                else:
-                    reponses.append(["(" + element[0] + ") " +
-                                      self.get_code_msg(element[0][:-1]),
-                                       arguments])
-            return "", reponses
+            # responses = []
+            # for element in ls01:
+            #     element = element.split(" ")
+            #     print("element: ", element)
+            #     para = ""
+            #     first = True
+            #     for arg in element:
+            #         if not first:
+            #             para = para + arg + " "
+            #         first = False
+            #     if "-" in element[0]:
+            #         responses.append(["(" + element[0][:3] + ") " +
+            #                           self.get_code_msg(element[0][:3]) +
+            #                            " " + element[0][3:], para[:-1]])
+            #     else:
+            #         responses.append(["(" + element[0] + ") " +
+            #                           self.get_code_msg(element[0][:-1]),
+            #                            para])
+            responses = []
+            para = []
+
+            for element in ls01:
+                responses.append(self.get_code_msg(element[0: 3]) + "(" + element[0: 3] + ")")
+                element = element[4:]
+                print("element: ", element)
+                para.append(element)
+
+            print("responses: ", responses)
+            return para, responses
         return "", ""
 
     def __init__(self, name, default, fmt, remain=0):
@@ -281,10 +306,8 @@ class SMTPResField(StrField):
         self.name = name
         StrField.__init__(self, name, default, fmt, remain)
 
-
 class SMTPReqField(StrField):
     holds_packets = 1
-    name = "SMTPReqField"
 
     def getfield(self, pkt, s):
         """
@@ -296,55 +319,62 @@ class SMTPReqField(StrField):
         @param pkt: holds the whole packet
         @param s: holds only the remaining data which is not dissected yet.
         """
-        cstream = -1
-        if pkt.underlayer.name == "TCP":
-            cstream = dissector.check_stream(\
-            pkt.underlayer.underlayer.fields["src"],\
-             pkt.underlayer.underlayer.fields["dst"],\
-              pkt.underlayer.fields["sport"],\
-               pkt.underlayer.fields["dport"],\
-                pkt.underlayer.fields["seq"], s)
-        if not cstream == -1:
-            s = cstream
-        remain = ""
-        value = ""
+        # cstream = -1
+        # if pkt.underlayer.name == "TCP":
+        #     cstream = dissector.check_stream(\
+        #     pkt.underlayer.underlayer.fields["src"],\
+        #      pkt.underlayer.underlayer.fields["dst"],\
+        #       pkt.underlayer.fields["sport"],\
+        #        pkt.underlayer.fields["dport"],\
+        #         pkt.underlayer.fields["seq"], s)
+        # if not cstream == -1:
+        #     s = cstream
+
+        comm = ""
+        para = ""
+
+        comm_list = ["MAIL", "QUIT", "EHLO", "HELO", "DATA", "AUTH", "RCPT", "REST", "VRFY", "NOOP"]
+
         ls = s.split()
         length = len(ls)
-        if ls[0].upper() == "DATA":
-            bind(pkt.underlayer.underlayer.fields["src"],
-                 pkt.underlayer.underlayer.fields["dst"],
-                 pkt.underlayer.fields["sport"])
-            return "", "DATA"
-        if ls[0].upper() == "QUIT":
-            unbind(pkt.underlayer.underlayer.fields["src"],
-                   pkt.underlayer.underlayer.fields["dst"],
-                   pkt.underlayer.fields["sport"])
-            return "", "QUIT"
-        if is_bounded(pkt.underlayer.underlayer.fields["src"],
-                     pkt.underlayer.underlayer.fields["dst"],
-                     pkt.underlayer.fields["sport"]):
-            set_tcp_ip(pkt.underlayer.underlayer.fields["src"],
-                     pkt.underlayer.underlayer.fields["dst"],
-                     pkt.underlayer.fields["sport"],\
-                      pkt.underlayer.fields["dport"],\
-                       pkt.underlayer.fields["seq"])
-            smtpd = SMTPData(s).fields["data"]
-            return "", ["DATA", smtpd]
+        ls01 = []
+        for i in range(length):
+            str01 = str(ls[i], encoding="utf-8")
+            ls01.append(str01)
+        ls01[0] = ls01[0].upper()
+        if ls01[0] in comm_list:
+            # if ls01[0] == "DATA":
+            #     bind(pkt.underlayer.underlayer.fields["src"],
+            #               pkt.underlayer.underlayer.fields["dst"],
+            #               pkt.underlayer.fields["sport"])
+            #
+            # if ls01[0] == "QUIT":
+            #     unbind(pkt.underlayer.underlayer.fields["src"],
+            #                   pkt.underlayer.underlayer.fields["dst"],
+            #                   pkt.underlayer.fields["sport"])
 
-        if length > 1:
-            value = ls[0]
-            if length == 2:
-                remain = ls[1]
-                return remain, value
-            else:
-                i = 1
-                remain = ' '
-                while i < length:
-                    remain = remain + ls[i] + ' '
-                    i = i + 1
-                return remain[:-1], value
+            comm = ls01[0]
+            j = 1
+            while j < len(ls01):
+                para = para + ls01[j]
+                j = j + 1
         else:
-            return "", ls[0]
+            comm = "Request command ERROR"
+            para = ""
+
+        return para, comm
+
+        # if is_bounded(pkt.underlayer.underlayer.fields["src"],
+        #              pkt.underlayer.underlayer.fields["dst"],
+        #              pkt.underlayer.fields["sport"]):
+        #     set_tcp_ip(pkt.underlayer.underlayer.fields["src"],
+        #              pkt.underlayer.underlayer.fields["dst"],
+        #              pkt.underlayer.fields["sport"],\
+        #               pkt.underlayer.fields["dport"],\
+        #                pkt.underlayer.fields["seq"])
+        #     smtpd = SMTPData(s).fields["data"]
+        #     return "", ["DATA", smtpd]
+
 
     def __init__(self, name, default, fmt, remain=0):
         """
@@ -360,6 +390,7 @@ class SMTPReqField(StrField):
         StrField.__init__(self, name, default, fmt, remain)
 
 
+
 class SMTPData(Packet):
     """
     class for handling the smtp data
@@ -369,16 +400,14 @@ class SMTPData(Packet):
     name = "smtp"
     fields_desc = [SMTPDataField("data", "")]
 
-
 class SMTPResponse(Packet):
     """
     class for handling the smtp responses
     @attention: this class inherets Packet
     """
     name = "smtp"
-    fields_desc = [SMTPResField("response", "", "H"),
-                    StrField("argument", "", "H")]
-
+    fields_desc = [SMTPResField("Response code ", "", "H"),
+                    StrField("Response para ", "", "H")]
 
 class SMTPRequest(Packet):
     """
@@ -386,8 +415,10 @@ class SMTPRequest(Packet):
     @attention: this class inherets Packet
     """
     name = "smtp"
-    fields_desc = [SMTPReqField("command", '', "H"),
-                    StrField("argument", '', "H")]
+    fields_desc = [SMTPReqField("Request comm ", '', "H"),
+                   StrField("Request para ", '', "H")]
+
+
 
 bind_layers(TCP, SMTPResponse, sport=25)
 bind_layers(TCP, SMTPRequest, dport=25)
