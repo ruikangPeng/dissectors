@@ -3,19 +3,19 @@ from smtp import *
 
 def parse_req(data):
     hex_data = hex_bytes(data)
-    print("req传入的参数：", hex_data)
+    print("req input：", hex_data)
     result = SMTPRequest(hex_data)
     result.show()
 
 def parse_res(data):
     hex_data = hex_bytes(data)
-    print("res传入的参数：", hex_data)
+    print("res input：", hex_data)
     result = SMTPResponse(hex_data)
     result.show()
 
 def parse_data(data):
     hex_data = hex_bytes(data)
-    print("data：", hex_data)
+    print("data input：", hex_data)
     result = SMTPDataField(hex_data)
     result.show()
 

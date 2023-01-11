@@ -30,14 +30,12 @@ bounded = []
 def get_tcp_ip():
     """
     this method is for retrieving the ip and tcp values
-    此方法用于检索 ip 和 tcp 值
     """
     return src, dst, sport, dport, seq
 
 def set_tcp_ip(srcp, dstp, sportp, dportp, seqp):
     """
     this method is for set values in the global variables for tcp/ip
-    此方法用于在 tcp/ip 的全局变量中设置值
     @param srcp: source ip address
     @param dstp: destination ip address
     @param sportp: source port number
@@ -77,7 +75,6 @@ def is_bounded(Src, Dst, Port):
     if [Src, Dst, Port] in bounded:
         return True
     return False
-
 
 
 class SMTPDataField(XByteField):
@@ -198,9 +195,8 @@ class SMTPResField(StrField):
         first value which belongs to this field and the second is
         the remaining which does need to be dissected with
         other "field classes".
-        此方法将获取数据包，取走需要取走的内容，然后让其余的走，因此它返回两个值。属于该字段的第一个值，第二个是剩余的值，需要与其他“字段类”一起剖析。
         @param pkt: holds the whole packet
-        @param s: holds only the remaining data which is not dissected yet.仅保留尚未剖析的剩余数据
+        @param s: holds only the remaining data which is not dissected yet.
         """
         # cstream = -1
         # if pkt.underlayer.name == "TCP":
@@ -215,32 +211,15 @@ class SMTPResField(StrField):
         remain = ""
         value = ""
         ls = s.splitlines()
-        print("ls:       ", ls)
         length_ls = len(ls)
-        print("length_ls: ", length_ls)
-
-
-        # python3区分str与bytes，这里将bytes转换成str, 注意到command中存在后缀'-'，理应除去
-        # ls01 = [str(ls[i], encoding="utf-8") for i in range(length)]
         ls01 = []
+
         for i in range(length_ls):
             str01 = str(ls[i], encoding="utf-8")
-
-            # if i == 0 or len(str01) > 3:
             str_list = str01.replace('-', ' ', 1)
             ls01.append(str_list)
 
-                # for j in range(len(str_list)):
-                #     if str_list[j] == '':
-                #         continue
-                #     else:
-                #         ls01.append(str_list[j])
-            # else:
-            #     ls01.append(str01)
-
         length = len(ls01)
-        print("ls01: ", ls01)
-        print("length:", length)
         if length == 1:
             value = ls01[0]
             arguments = ""
@@ -251,35 +230,12 @@ class SMTPResField(StrField):
                     arguments = arguments + arg + " "
                 first = False
             if "-" in res[0]:
-                # value = "(" + res[0][:3] + ") " +\
-                #  self.get_code_msg(res[0][:3]) + " " + res[0][3:]
                 value = self.get_code_msg(res[0][:3]) + " " + res[0][3:] + "(" + res[0][:3] + ")"
             else:
-                # value = "(" + res[0] + ") " + self.get_code_msg(res[0])
                 value = self.get_code_msg(res[0]) + "(" + res[0] + ")"
-            print("arguments[:-1] :", arguments[:-1])
-            print("value:", value)
             return arguments[:-1], [value]
 
         if length > 1:
-            # responses = []
-            # for element in ls01:
-            #     element = element.split(" ")
-            #     print("element: ", element)
-            #     para = ""
-            #     first = True
-            #     for arg in element:
-            #         if not first:
-            #             para = para + arg + " "
-            #         first = False
-            #     if "-" in element[0]:
-            #         responses.append(["(" + element[0][:3] + ") " +
-            #                           self.get_code_msg(element[0][:3]) +
-            #                            " " + element[0][3:], para[:-1]])
-            #     else:
-            #         responses.append(["(" + element[0] + ") " +
-            #                           self.get_code_msg(element[0][:-1]),
-            #                            para])
             responses = []
             para = []
 
@@ -388,8 +344,6 @@ class SMTPReqField(StrField):
         """
         self.name = name
         StrField.__init__(self, name, default, fmt, remain)
-
-
 
 class SMTPData(Packet):
     """
